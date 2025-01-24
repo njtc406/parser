@@ -1,0 +1,23 @@
+# 打表工具配置
+
+# xlsx文件所在目录
+FileDir: "./xlsx"
+
+# 客户端输出目录
+ClientOutPath: "./output/client"
+
+# 服务端输出目录
+ServerOutPath: "./output/server"
+
+# GM输出目录
+GMOutPath: "./output/gm"
+
+# 解析器需要解析的文件后缀
+ParseFileSuffix:
+  - ".xlsx"
+
+#解析器需要解析的文件前缀(如果没有前缀,默认只解析第一个文件)
+ParserPrefix: "c_"
+
+# 输出文件格式
+OutputFileFormat: "json"
