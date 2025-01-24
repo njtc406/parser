@@ -7,13 +7,26 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"parser/internal/config"
 	"parser/internal/parser"
 )
 
 func main() {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println("======================运行失败=======================")
+			fmt.Println("error:", r)
+			fmt.Println("==============================================")
+		}
+	}()
+	var confPath string
+	if len(os.Args) > 1 {
+		confPath = os.Args[1]
+	}
+
 	// 解析配置文件
-	config.Init()
+	config.Init(confPath)
 
 	fmt.Println("======================配置信息=======================")
 	fmt.Println()

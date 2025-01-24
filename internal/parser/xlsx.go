@@ -37,6 +37,7 @@ func NewXlsxParser() *xlsxParser {
 }
 
 func (x *xlsxParser) write(fileName string) error {
+	fileName = strings.TrimPrefix(fileName, config.Conf.ParserPrefix) // 去掉文件名的前缀
 	// 写入数据
 	data, err := formatter.NewFactory().NewFormatter(config.Conf.OutputFileFormat)
 	if err != nil {
@@ -147,9 +148,14 @@ func (x *xlsxParser) parseSheet(sheet *xlsx.Sheet) error {
 		serverRowData := make(map[string]interface{})
 		gmRowData := make(map[string]interface{})
 		// 遍历每一列
-		for colIndex, cell := range row.Cells {
-			if colIndex >= len(x.headers) {
-				break // 如果列数超过表头列数，则跳过
+		for colIndex := 0; colIndex < len(x.headers); colIndex++ {
+			var cellStr string
+			// 这里是防止这行配置不全,导致一些列读取不到
+			if colIndex >= len(row.Cells) {
+				cellStr = ""
+			} else {
+				cell := row.Cells[colIndex]
+				cellStr = cell.String()
 			}
 
 			header := x.headers[colIndex]
@@ -158,11 +164,10 @@ func (x *xlsxParser) parseSheet(sheet *xlsx.Sheet) error {
 			}
 
 			// 解析单元格值
-			value, err := x.parseCellValue(header.tp, cell.String())
+			value, err := x.parseCellValue(header.tp, cellStr)
 			if err != nil {
 				return fmt.Errorf("解析表[%s] 行:%d, 列:%d error:%v", sheet.Name, rowIndex+5, colIndex+1, err)
 			}
-
 			// 将解析后的值存储
 			if strings.Contains(header.belong, "c") {
 				clientRowData[header.name] = value
@@ -236,7 +241,6 @@ func GetTypeDefaultValue(typeName string) (interface{}, error) {
 var delimiters = []string{"|", ";", ":", ","} // 顺序是从最外的一层分隔符到最内的一层分隔符
 
 func (x *xlsxParser) parseCellValue(tp string, value string) (interface{}, error) {
-
 	return x.parseCellValueWithDelimiter(tp, value, 0)
 }
 

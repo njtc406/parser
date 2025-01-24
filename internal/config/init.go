@@ -9,6 +9,7 @@ import (
 	"github.com/njtc406/chaosutil/validate"
 	"github.com/njtc406/viper"
 	"os"
+	"path/filepath"
 )
 
 var (
@@ -18,20 +19,24 @@ var (
 
 const defaultConfPath = "./configs"
 
-func Init() {
+func Init(confPath string) {
 	// 解析配置
-	parseConf()
+	parseConf(confPath)
 	clearOutDir()
 	// 初始化目录
 	initDir()
 }
 
 // parseConf 解析本地配置文件
-func parseConf() {
+func parseConf(confPath string) {
+	if confPath == "" {
+		confPath = defaultConfPath
+	}
+
 	// 解析配置路径
 	runtimeViper.SetConfigType("yaml")
 	runtimeViper.SetConfigName("conf")
-	runtimeViper.AddConfigPath(defaultConfPath)
+	runtimeViper.AddConfigPath(filepath.ToSlash(confPath))
 
 	if err := runtimeViper.ReadInConfig(); err != nil {
 		panic(err)
