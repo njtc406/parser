@@ -36,6 +36,13 @@ func NewXlsxParser() *xlsxParser {
 	return &xlsxParser{}
 }
 
+func (x *xlsxParser) cleanup() {
+	x.headers = nil
+	x.resultClient = nil
+	x.resultServer = nil
+	x.resultGm = nil
+}
+
 func (x *xlsxParser) write(fileName string) error {
 	fileName = strings.TrimPrefix(fileName, config.Conf.ParserPrefix) // 去掉文件名的前缀
 	// 写入数据
@@ -99,6 +106,7 @@ func (x *xlsxParser) Parse(filePath string) error {
 		sheet := f.Sheets[i]
 		if config.Conf.ParserPrefix == "" || strings.HasPrefix(sheet.Name, config.Conf.ParserPrefix) {
 			//labelName := strings.TrimPrefix(sheet.Name, config.Conf.ParserPrefix)
+			x.cleanup()
 			fmt.Println("  -->开始解析表:", sheet.Name)
 			if err = x.parseSheet(sheet); err != nil {
 				return err
